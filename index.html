@@ -10,35 +10,25 @@
       font-family: sans-serif;
       display: flex;
       flex-direction: column;
+      height: 100vh;
+      justify-content: space-between;
       align-items: center;
-      justify-content: flex-start;
+      background: #fff;
     }
 
     .title {
-      width: 100%;
       text-align: center;
       font-size: 1.8em;
       font-weight: bold;
-      margin: 15px 0 5px 0;
-    }
-
-    .image-container {
-      width: 100%;
-    }
-
-    .image-container img {
-      width: 100%;
-      max-height: 300px;
-      object-fit: cover;
+      margin-top: 20px;
     }
 
     .button-container {
-      position: fixed;
-      bottom: 10px;
       width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
+      margin-bottom: 20px;
     }
 
     .trigger-button {
@@ -72,15 +62,18 @@
       font-size: 1em;
       white-space: nowrap;
     }
+
+    .counter {
+      font-size: 2em;
+      margin-top: 20px;
+      color: #333;
+    }
   </style>
 </head>
 <body>
 
   <div class="title">손내향미 예약 연습</div>
-
-  <div class="image-container">
-    <img src="https://cdn.pixabay.com/photo/2020/06/22/20/25/korean-food-5328772_1280.jpg" alt="갈비솥밥">
-  </div>
+  <div class="counter" id="counter">5</div>
 
   <div class="button-container">
     <button class="trigger-button">예약하기!</button>
@@ -99,10 +92,46 @@
   <script>
     const triggerButton = document.querySelector(".trigger-button");
     const timeButtons = document.querySelector(".time-buttons");
+    const counter = document.getElementById("counter");
+    let count = 5;
+    let timer;
+    let clicked = false;
+
+    function startCountdown() {
+      timer = setInterval(() => {
+        count--;
+        counter.textContent = count;
+        if (count <= 0) {
+          clearInterval(timer);
+          if (!clicked) {
+            alert("실패했습니다.");
+          }
+        }
+      }, 1000);
+    }
 
     triggerButton.addEventListener("click", () => {
+      if (clicked) return;
+      clicked = true;
+      triggerButton.disabled = true;
       timeButtons.style.display = "flex";
+      setTimeout(() => {
+        if (!document.querySelector(".time-buttons button.clicked")) {
+          alert("실패했습니다.");
+        }
+      }, 5000);
     });
+
+    document.querySelectorAll(".time-buttons button").forEach(button => {
+      button.addEventListener("click", () => {
+        if (!clicked) return;
+        button.classList.add("clicked");
+        clearInterval(timer);
+        alert("성공했습니다!");
+      });
+    });
+
+    startCountdown();
   </script>
 
 </body>

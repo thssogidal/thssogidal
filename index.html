@@ -9,7 +9,7 @@
       text-align: center;
       margin-top: 50px;
     }
-    #status {
+    #status, #countdown {
       font-size: 1.5em;
       margin-top: 20px;
       color: #333;
@@ -17,27 +17,54 @@
     button {
       font-size: 1.2em;
       padding: 10px 20px;
+      margin: 5px;
+    }
+    #timeButtons {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
   <h1>손내향미 예약 연습 시뮬레이터</h1>
+  <div id="countdown">5초 후 예약 시작</div>
   <button onclick="tryReserve()">예약하기</button>
   <div id="status">예약 오픈 대기 중...</div>
+  <div id="timeButtons" style="display:none;">
+    <button>12:00</button>
+    <button>12:30</button>
+    <button>1:30</button>
+    <button>2:00</button>
+  </div>
 
   <script>
-    const openTime = new Date().getTime() + 10000; // 현재 시간 기준 10초 뒤
+    // 예약 오픈 시간: 현재 시간 + 5초
+    let openTime = new Date().getTime() + 5000;
+    let countdownEl = document.getElementById("countdown");
+    let statusEl = document.getElementById("status");
+    let timeButtonsEl = document.getElementById("timeButtons");
+
+    function updateCountdown() {
+      let now = new Date().getTime();
+      let remaining = Math.max(0, Math.ceil((openTime - now) / 1000));
+      countdownEl.innerText = remaining > 0
+        ? remaining + "초 후 예약 시작"
+        : "예약 가능!";
+      if (remaining <= 0) clearInterval(timer);
+    }
+
+    let timer = setInterval(updateCountdown, 100);
 
     function tryReserve() {
-      const now = new Date().getTime();
-      const diff = now - openTime;
+      let now = new Date().getTime();
+      let diff = now - openTime;
 
-      if (diff >= 0 && diff <= 1000) {
-        document.getElementById("status").innerText = "🎉 예약 성공!";
+      if (diff >= 0 && diff <= 5100) {
+        statusEl.innerText = "🎉 예약 가능 시간!";
+        timeButtonsEl.style.display = "block";
       } else if (diff < 0) {
-        document.getElementById("status").innerText = "❌ 아직 오픈 전입니다.";
+        statusEl.innerText = "❌ 아직 오픈 전입니다.";
       } else {
-        document.getElementById("status").innerText = "😭 이미 늦었습니다.";
+        statusEl.innerText = "😭 이미 늦었습니다.";
       }
     }
   </script>

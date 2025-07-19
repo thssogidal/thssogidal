@@ -6,78 +6,77 @@
   <title>손내향미 예약 연습</title>
   <style>
     body {
-      margin: 0;
       font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      justify-content: space-between;
-      align-items: center;
-      background: #fff;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
     }
 
-    .title {
-      text-align: center;
-      font-size: 1.8em;
+    /* 중앙 메시지 */
+    #message {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
       font-weight: bold;
-      margin-top: 20px;
+      text-align: center;
     }
 
-    .button-container {
+    /* 하단 버튼 영역 */
+    #bottomArea {
+      position: fixed;
+      bottom: 0;
       width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 20px;
+      background-color: white;
+      padding: 10px 0;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      text-align: center;
     }
 
-    .trigger-button {
+    #startButton, #retryButton {
+      font-size: 18px;
       padding: 12px 24px;
-      font-size: 1.2em;
+      margin: 5px;
+    }
+
+    #triggerButton {
       background-color: orange;
       color: white;
       border: none;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      touch-action: manipulation;
+      padding: 12px 24px;
+      font-size: 18px;
     }
 
-    .time-buttons {
-      display: flex;
+    #timeButtons {
+      display: none;
+      white-space: nowrap;
       overflow-x: auto;
-      gap: 10px;
-      padding: 0 10px;
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
+      padding: 10px 0;
     }
 
-    .time-buttons button {
-      min-width: 80px;
-      padding: 10px;
+    #timeButtons button {
       background-color: #FF6600;
       color: white;
       border: none;
-      border-radius: 6px;
-      font-size: 1em;
-      white-space: nowrap;
-    }
-
-    .counter {
-      font-size: 2em;
-      margin-top: 20px;
-      color: #333;
+      width: 100px;
+      height: 50px;
+      margin: 0 5px;
+      flex-shrink: 0;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
 
-  <div class="title">손내향미 예약 연습</div>
-  <div class="counter" id="counter">5</div>
+  <!-- 중앙 메시지 -->
+  <div id="message">예약 오픈 대기 중...</div>
 
-  <div class="button-container">
-    <button class="trigger-button">예약하기!</button>
-    <div class="time-buttons" style="display: none;">
+  <!-- 하단 영역 -->
+  <div id="bottomArea">
+    <button id="startButton">시작하기</button>
+    <div id="triggerButtonContainer"></div>
+    <div id="timeButtons">
       <button>12:00</button>
       <button>12:30</button>
       <button>1:30</button>
@@ -87,52 +86,75 @@
       <button>5:00</button>
       <button>6:00</button>
     </div>
+    <button id="retryButton" style="display: none;">재도전하시겠습니까?</button>
   </div>
 
   <script>
-    const triggerButton = document.querySelector(".trigger-button");
-    const timeButtons = document.querySelector(".time-buttons");
-    const counter = document.getElementById("counter");
-    let count = 5;
-    let timer;
+    const startButton = document.getElementById("startButton");
+    const message = document.getElementById("message");
+    const triggerButtonContainer = document.getElementById("triggerButtonContainer");
+    const timeButtons = document.getElementById("timeButtons");
+    const retryButton = document.getElementById("retryButton");
+
+    let triggerShownAt = 0;
+    let autoFailTimeout = null;
     let clicked = false;
 
-    function startCountdown() {
-      timer = setInterval(() => {
-        count--;
-        counter.textContent = count;
-        if (count <= 0) {
-          clearInterval(timer);
-          if (!clicked) {
-            alert("실패했습니다.");
-          }
-        }
-      }, 1000);
+    function showCountdown(seconds) {
+      if (seconds === 0) {
+        message.textContent = "예약 가능!";
+        showTriggerButton();
+        return;
+      }
+      message.textContent = `${seconds}초 후 예약 가능!`;
+      setTimeout(() => showCountdown(seconds - 1), 1000);
     }
 
-    triggerButton.addEventListener("click", () => {
-      if (clicked) return;
-      clicked = true;
-      triggerButton.disabled = true;
-      timeButtons.style.display = "flex";
-      setTimeout(() => {
-        if (!document.querySelector(".time-buttons button.clicked")) {
-          alert("실패했습니다.");
-        }
-      }, 5000);
-    });
+    function showTriggerButton() {
+      const triggerButton = document.createElement("button");
+      triggerButton.id = "triggerButton";
+      triggerButton.textContent = "예약하기!";
+      triggerButtonContainer.innerHTML = "";
+      triggerButtonContainer.appendChild(triggerButton);
+      triggerShownAt = performance.now();
+      clicked = false;
 
-    document.querySelectorAll(".time-buttons button").forEach(button => {
-      button.addEventListener("click", () => {
-        if (!clicked) return;
-        button.classList.add("clicked");
-        clearInterval(timer);
-        alert("성공했습니다!");
+      triggerButton.addEventListener("click", () => {
+        setTimeout(() => {
+          const clickedAt = performance.now();
+          const diff = clickedAt - triggerShownAt;
+          if (diff <= 350) {
+            clicked = true;
+            clearTimeout(autoFailTimeout);
+            timeButtons.style.display = "block";
+            triggerButtonContainer.innerHTML = "";
+          }
+        }, 100);
       });
+
+      autoFailTimeout = setTimeout(() => {
+        if (!clicked) {
+          message.textContent = "실패! 너무 늦었습니다.";
+          triggerButtonContainer.innerHTML = "";
+          retryButton.style.display = "inline-block";
+        }
+      }, 350);
+    }
+
+    startButton.addEventListener("click", () => {
+      message.textContent = "예약 오픈 대기 중...";
+      startButton.style.display = "none";
+      timeButtons.style.display = "none";
+      retryButton.style.display = "none";
+      showCountdown(5);
     });
 
-    startCountdown();
+    retryButton.addEventListener("click", () => {
+      startButton.style.display = "inline-block";
+      message.textContent = "예약 오픈 대기 중...";
+      retryButton.style.display = "none";
+      timeButtons.style.display = "none";
+    });
   </script>
-
 </body>
 </html>

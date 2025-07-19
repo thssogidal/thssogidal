@@ -7,26 +7,61 @@
   <style>
     body {
       font-family: sans-serif;
-      text-align: center;
-      margin-top: 100px;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
     }
-    button {
+
+    /* 상단 이미지 전체 채우기 */
+    #topImage {
+      width: 100%;
+      height: 50vh;
+      object-fit: cover;
+    }
+
+    /* 중앙 메시지 */
+    #message {
+      position: absolute;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       font-size: 20px;
-      padding: 10px 20px;
-      margin: 10px;
+      font-weight: bold;
+      text-align: center;
     }
+
+    /* 하단 버튼 영역 */
+    #bottomArea {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: white;
+      padding: 10px 0;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    #startButton, #retryButton {
+      font-size: 18px;
+      padding: 12px 24px;
+      margin: 5px;
+    }
+
     #triggerButton {
       background-color: orange;
       color: white;
       border: none;
+      padding: 12px 24px;
+      font-size: 18px;
     }
+
     #timeButtons {
       display: none;
       white-space: nowrap;
       overflow-x: auto;
-      margin-top: 20px;
-      padding: 10px;
+      padding: 10px 0;
     }
+
     #timeButtons button {
       background-color: #FF6600;
       color: white;
@@ -35,28 +70,34 @@
       height: 50px;
       margin: 0 5px;
       flex-shrink: 0;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
-  <h1>손내향미 예약 연습</h1>
+
+  <!-- 상단 이미지 -->
+  <img id="topImage" src="https://buza.biz/bbs/.../e0a2e614d09960e2ce853519cc3a732c_1696984097_8628.jpg" alt="갈비솥밥">
+
+  <!-- 중앙 메시지 -->
   <div id="message">예약 오픈 대기 중...</div>
-  <br />
-  <button id="startButton">시작하기</button>
-  <div id="triggerButtonContainer"></div>
 
-  <div id="timeButtons">
-    <button>12:00</button>
-    <button>12:30</button>
-    <button>1:30</button>
-    <button>2:00</button>
-    <button>3:00</button>
-    <button>4:00</button>
-    <button>5:00</button>
-    <button>6:00</button>
+  <!-- 하단 영역 -->
+  <div id="bottomArea">
+    <button id="startButton">시작하기</button>
+    <div id="triggerButtonContainer"></div>
+    <div id="timeButtons">
+      <button>12:00</button>
+      <button>12:30</button>
+      <button>1:30</button>
+      <button>2:00</button>
+      <button>3:00</button>
+      <button>4:00</button>
+      <button>5:00</button>
+      <button>6:00</button>
+    </div>
+    <button id="retryButton" style="display: none;">재도전하시겠습니까?</button>
   </div>
-
-  <button id="retryButton" style="display: none;">재도전하시겠습니까?</button>
 
   <script>
     const startButton = document.getElementById("startButton");
@@ -92,7 +133,6 @@
         setTimeout(() => {
           const clickedAt = performance.now();
           const diff = clickedAt - triggerShownAt;
-
           if (diff <= 350) {
             clicked = true;
             clearTimeout(autoFailTimeout);

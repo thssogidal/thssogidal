@@ -23,6 +23,9 @@
     #timeButtons {
       display: none;
       white-space: nowrap;
+      overflow-x: auto;
+      margin-top: 20px;
+      padding: 10px;
     }
     #timeButtons button {
       background-color: #FF6600;
@@ -31,6 +34,7 @@
       width: 100px;
       height: 50px;
       margin: 0 5px;
+      flex-shrink: 0;
     }
   </style>
 </head>
@@ -40,12 +44,18 @@
   <br />
   <button id="startButton">시작하기</button>
   <div id="triggerButtonContainer"></div>
+
   <div id="timeButtons">
     <button>12:00</button>
     <button>12:30</button>
     <button>1:30</button>
     <button>2:00</button>
+    <button>3:00</button>
+    <button>4:00</button>
+    <button>5:00</button>
+    <button>6:00</button>
   </div>
+
   <button id="retryButton" style="display: none;">재도전하시겠습니까?</button>
 
   <script>

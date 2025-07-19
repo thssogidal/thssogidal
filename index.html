@@ -6,87 +6,85 @@
   <title>손내향미 예약 연습</title>
   <style>
     body {
-      font-family: sans-serif;
       margin: 0;
-      padding: 0;
-      overflow: hidden;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
     }
 
-    /* 상단 이미지 전체 채우기 */
-    #topImage {
+    .title {
       width: 100%;
-      height: 50vh;
+      text-align: center;
+      font-size: 1.8em;
+      font-weight: bold;
+      margin: 15px 0 5px 0;
+    }
+
+    .image-container {
+      width: 100%;
+    }
+
+    .image-container img {
+      width: 100%;
+      max-height: 300px;
       object-fit: cover;
     }
 
-    /* 중앙 메시지 */
-    #message {
-      position: absolute;
-      top: 55%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 20px;
-      font-weight: bold;
-      text-align: center;
-    }
-
-    /* 하단 버튼 영역 */
-    #bottomArea {
+    .button-container {
       position: fixed;
-      bottom: 0;
+      bottom: 10px;
       width: 100%;
-      background-color: white;
-      padding: 10px 0;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    #startButton, #retryButton {
-      font-size: 18px;
+    .trigger-button {
       padding: 12px 24px;
-      margin: 5px;
-    }
-
-    #triggerButton {
+      font-size: 1.2em;
       background-color: orange;
       color: white;
       border: none;
-      padding: 12px 24px;
-      font-size: 18px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      touch-action: manipulation;
     }
 
-    #timeButtons {
-      display: none;
-      white-space: nowrap;
+    .time-buttons {
+      display: flex;
       overflow-x: auto;
-      padding: 10px 0;
+      gap: 10px;
+      padding: 0 10px;
+      width: 100%;
+      justify-content: center;
+      box-sizing: border-box;
     }
 
-    #timeButtons button {
+    .time-buttons button {
+      min-width: 80px;
+      padding: 10px;
       background-color: #FF6600;
       color: white;
       border: none;
-      width: 100px;
-      height: 50px;
-      margin: 0 5px;
-      flex-shrink: 0;
-      font-size: 16px;
+      border-radius: 6px;
+      font-size: 1em;
+      white-space: nowrap;
     }
   </style>
 </head>
 <body>
 
-  <!-- 상단 이미지 -->
-  <img id="topImage" src="https://buza.biz/bbs/.../e0a2e614d09960e2ce853519cc3a732c_1696984097_8628.jpg" alt="갈비솥밥">
+  <div class="title">손내향미 예약 연습</div>
 
-  <!-- 중앙 메시지 -->
-  <div id="message">예약 오픈 대기 중...</div>
+  <div class="image-container">
+    <img src="https://cdn.pixabay.com/photo/2020/06/22/20/25/korean-food-5328772_1280.jpg" alt="갈비솥밥">
+  </div>
 
-  <!-- 하단 영역 -->
-  <div id="bottomArea">
-    <button id="startButton">시작하기</button>
-    <div id="triggerButtonContainer"></div>
-    <div id="timeButtons">
+  <div class="button-container">
+    <button class="trigger-button">예약하기!</button>
+    <div class="time-buttons" style="display: none;">
       <button>12:00</button>
       <button>12:30</button>
       <button>1:30</button>
@@ -96,75 +94,16 @@
       <button>5:00</button>
       <button>6:00</button>
     </div>
-    <button id="retryButton" style="display: none;">재도전하시겠습니까?</button>
   </div>
 
   <script>
-    const startButton = document.getElementById("startButton");
-    const message = document.getElementById("message");
-    const triggerButtonContainer = document.getElementById("triggerButtonContainer");
-    const timeButtons = document.getElementById("timeButtons");
-    const retryButton = document.getElementById("retryButton");
+    const triggerButton = document.querySelector(".trigger-button");
+    const timeButtons = document.querySelector(".time-buttons");
 
-    let triggerShownAt = 0;
-    let autoFailTimeout = null;
-    let clicked = false;
-
-    function showCountdown(seconds) {
-      if (seconds === 0) {
-        message.textContent = "예약 가능!";
-        showTriggerButton();
-        return;
-      }
-      message.textContent = `${seconds}초 후 예약 가능!`;
-      setTimeout(() => showCountdown(seconds - 1), 1000);
-    }
-
-    function showTriggerButton() {
-      const triggerButton = document.createElement("button");
-      triggerButton.id = "triggerButton";
-      triggerButton.textContent = "예약하기!";
-      triggerButtonContainer.innerHTML = "";
-      triggerButtonContainer.appendChild(triggerButton);
-      triggerShownAt = performance.now();
-      clicked = false;
-
-      triggerButton.addEventListener("click", () => {
-        setTimeout(() => {
-          const clickedAt = performance.now();
-          const diff = clickedAt - triggerShownAt;
-          if (diff <= 350) {
-            clicked = true;
-            clearTimeout(autoFailTimeout);
-            timeButtons.style.display = "block";
-            triggerButtonContainer.innerHTML = "";
-          }
-        }, 100);
-      });
-
-      autoFailTimeout = setTimeout(() => {
-        if (!clicked) {
-          message.textContent = "실패! 너무 늦었습니다.";
-          triggerButtonContainer.innerHTML = "";
-          retryButton.style.display = "inline-block";
-        }
-      }, 350);
-    }
-
-    startButton.addEventListener("click", () => {
-      message.textContent = "예약 오픈 대기 중...";
-      startButton.style.display = "none";
-      timeButtons.style.display = "none";
-      retryButton.style.display = "none";
-      showCountdown(5);
-    });
-
-    retryButton.addEventListener("click", () => {
-      startButton.style.display = "inline-block";
-      message.textContent = "예약 오픈 대기 중...";
-      retryButton.style.display = "none";
-      timeButtons.style.display = "none";
+    triggerButton.addEventListener("click", () => {
+      timeButtons.style.display = "flex";
     });
   </script>
+
 </body>
 </html>

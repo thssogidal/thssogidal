@@ -1,59 +1,73 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>손내향미 예약 연습</title>
+  <meta charset="UTF-8">
+  <title>손내향미 예약 연습기</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: sans-serif;
       text-align: center;
-      margin-top: 50px;
-    }
-    #countdown, #triggerButton, #timeButtons, #message, #retryButton {
-      margin-top: 20px;
+      margin-top: 100px;
     }
     #triggerButton {
-      background-color: orange;
+      padding: 12px 24px;
+      font-size: 20px;
+      background-color: #FFA500;
       color: white;
-      padding: 10px 20px;
-      font-size: 18px;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
+    }
+    #startButton {
+      padding: 12px 24px;
+      font-size: 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .time-button {
+      margin: 10px;
+      padding: 12px 24px;
+      font-size: 18px;
+      border: 1px solid #aaa;
+      border-radius: 6px;
     }
     #retryButton {
-      background-color: gray;
-      color: white;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
       display: none;
-    }
-    #timeButtons button {
-      margin: 5px;
-      padding: 10px;
+      margin-top: 20px;
+      padding: 10px 20px;
       font-size: 16px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h1>손내향미 예약 연습</h1>
+
+  <h1>손내향미 예약 연습기</h1>
+  <p id="status">예약 오픈 대기 중...</p>
   <button id="startButton">시작하기</button>
-  <div id="countdown"></div>
+
   <div id="triggerButtonContainer"></div>
+
   <div id="timeButtons" style="display: none;">
-    <button>12:00</button>
-    <button>12:30</button>
-    <button>13:30</button>
-    <button>14:00</button>
+    <button class="time-button">12:00</button>
+    <button class="time-button">12:30</button>
+    <button class="time-button">1:30</button>
+    <button class="time-button">2:00</button>
   </div>
-  <div id="message"></div>
-  <button id="retryButton">재도전하시겠습니까?</button>
+
+  <p id="message"></p>
+  <button id="retryButton">재도전하기</button>
 
   <script>
+    const status = document.getElementById("status");
     const startButton = document.getElementById("startButton");
-    const countdown = document.getElementById("countdown");
     const triggerButtonContainer = document.getElementById("triggerButtonContainer");
     const timeButtons = document.getElementById("timeButtons");
     const message = document.getElementById("message");
@@ -62,19 +76,17 @@
     let triggerShownAt = null;
 
     startButton.addEventListener("click", () => {
-      countdown.textContent = "예약 오픈 대기 중...";
-      message.textContent = "";
-      timeButtons.style.display = "none";
-      triggerButtonContainer.innerHTML = "";
-      retryButton.style.display = "none";
+      startButton.style.display = "none";
+      status.textContent = "예약 시작까지 5초...";
+      let countdown = 5;
 
-      let timeLeft = 5;
       const interval = setInterval(() => {
-        countdown.textContent = `${timeLeft}초 후 예약 가능!`;
-        timeLeft--;
-        if (timeLeft < 0) {
+        countdown--;
+        if (countdown > 0) {
+          status.textContent = `예약 시작까지 ${countdown}초...`;
+        } else {
           clearInterval(interval);
-          countdown.textContent = "";
+          status.textContent = "예약 가능!";
           showTriggerButton();
         }
       }, 1000);
@@ -84,10 +96,17 @@
       const button = document.createElement("button");
       button.textContent = "예약하기!";
       button.id = "triggerButton";
+      button.style.backgroundColor = "#FFA500";
+      triggerButtonContainer.innerHTML = "";
       triggerButtonContainer.appendChild(button);
       triggerShownAt = performance.now();
 
-      button.addEventListener("click", () => {
+      let clicked = false;
+
+      function handleTriggerClick() {
+        if (clicked) return;
+        clicked = true;
+
         const clickedAt = performance.now();
         const diff = clickedAt - triggerShownAt;
 
@@ -99,16 +118,21 @@
           retryButton.style.display = "inline-block";
           triggerButtonContainer.innerHTML = "";
         }
-      });
+      }
+
+      // 빠른 터치 감지를 위해 touchstart 우선
+      button.addEventListener("touchstart", handleTriggerClick);
+      button.addEventListener("click", handleTriggerClick);
     }
 
     retryButton.addEventListener("click", () => {
       retryButton.style.display = "none";
-      countdown.textContent = "";
       message.textContent = "";
       timeButtons.style.display = "none";
-      triggerButtonContainer.innerHTML = "";
+      startButton.style.display = "inline-block";
+      status.textContent = "예약 오픈 대기 중...";
     });
   </script>
+
 </body>
 </html>

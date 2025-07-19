@@ -42,7 +42,7 @@
 <body>
   <h1>손내향미 예약 시뮬레이터</h1>
   <div id="status">예약 오픈 대기 중...</div>
-  <button id="reserveButton">예약하기</button>
+  <button id="reserveButton">시작하기</button>
   <button id="triggerButton">빠르게 눌러 예약 확정!</button>
   <div id="times">
     <button class="time-button">12:00</button>
@@ -74,7 +74,7 @@
           clearInterval(countdown);
           showTriggerButton();
         }
-      }, 2000);
+      }, 1000);
     }
 
     function showTriggerButton() {
@@ -83,15 +83,15 @@
       reserveOpenedAt = performance.now();
       triggerActive = true;
 
-      // 0.1초 후 자동으로 버튼 비활성화
+      // 0.25초 후 자동으로 버튼 비활성화
       setTimeout(() => {
         triggerActive = false;
         if (!clickedInTime) {
           triggerButton.style.display = "none";
-          statusText.textContent = "실패! 0.1초를 넘겼습니다.";
+          statusText.textContent = "실패! 0.25초를 넘겼습니다.";
           retryButton.style.display = "inline-block";
         }
-      }, 100); // 0.1초
+      }, 250); // ← 여기 변경됨
     }
 
     function resetAll() {
@@ -113,7 +113,7 @@
       const now = performance.now();
       const elapsed = now - reserveOpenedAt;
 
-      if (triggerActive && elapsed <= 100) {
+      if (triggerActive && elapsed <= 250) {
         clickedInTime = true;
         triggerButton.style.display = "none";
         statusText.textContent = "성공! 원하는 시간을 선택하세요.";

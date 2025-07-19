@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>손내향미 예약 연습기</title>
+  <title>손내향미 예약 연습</title>
   <style>
     body {
       font-family: sans-serif;
@@ -20,20 +20,27 @@
       color: white;
       border: none;
     }
+    #timeButtons {
+      display: none;
+      white-space: nowrap;
+    }
     #timeButtons button {
       background-color: #FF6600;
       color: white;
       border: none;
+      width: 100px;
+      height: 50px;
+      margin: 0 5px;
     }
   </style>
 </head>
 <body>
-  <h1>손내향미 예약 연습 시뮬레이터</h1>
+  <h1>손내향미 예약 연습</h1>
   <div id="message">예약 오픈 대기 중...</div>
   <br />
   <button id="startButton">시작하기</button>
   <div id="triggerButtonContainer"></div>
-  <div id="timeButtons" style="display: none;">
+  <div id="timeButtons">
     <button>12:00</button>
     <button>12:30</button>
     <button>1:30</button>
@@ -71,7 +78,6 @@
       triggerShownAt = performance.now();
       clicked = false;
 
-      // 클릭 이벤트
       triggerButton.addEventListener("click", () => {
         setTimeout(() => {
           const clickedAt = performance.now();
@@ -83,10 +89,9 @@
             timeButtons.style.display = "block";
             triggerButtonContainer.innerHTML = "";
           }
-        }, 100); // 100ms 반응 딜레이
+        }, 100);
       });
 
-      // 자동 실패 처리
       autoFailTimeout = setTimeout(() => {
         if (!clicked) {
           message.textContent = "실패! 너무 늦었습니다.";

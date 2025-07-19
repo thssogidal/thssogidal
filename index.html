@@ -45,36 +45,47 @@
 
     let triggerShownAt = 0;
 
+    function showCountdown(seconds) {
+      if (seconds === 0) {
+        message.textContent = "예약 가능!";
+        showTriggerButton();
+        return;
+      }
+      message.textContent = `${seconds}초 후 예약 가능!`;
+      setTimeout(() => showCountdown(seconds - 1), 1000);
+    }
+
+    function showTriggerButton() {
+      const triggerButton = document.createElement("button");
+      triggerButton.id = "triggerButton";
+      triggerButton.textContent = "예약하기!";
+      triggerButtonContainer.innerHTML = "";
+      triggerButtonContainer.appendChild(triggerButton);
+      triggerShownAt = performance.now();
+
+      triggerButton.addEventListener("click", () => {
+        setTimeout(() => {
+          const clickedAt = performance.now();
+          const diff = clickedAt - triggerShownAt;
+
+          if (diff <= 350) {
+            timeButtons.style.display = "block";
+            triggerButtonContainer.innerHTML = "";
+          } else {
+            message.textContent = "실패! 너무 늦었습니다.";
+            retryButton.style.display = "inline-block";
+            triggerButtonContainer.innerHTML = "";
+          }
+        }, 100); // 100ms 반응 딜레이
+      });
+    }
+
     startButton.addEventListener("click", () => {
-      message.textContent = "5초 후 예약 가능!";
+      message.textContent = "예약 오픈 대기 중...";
       startButton.style.display = "none";
       timeButtons.style.display = "none";
       retryButton.style.display = "none";
-
-      setTimeout(() => {
-        const triggerButton = document.createElement("button");
-        triggerButton.id = "triggerButton";
-        triggerButton.textContent = "예약하기!";
-        triggerButtonContainer.innerHTML = "";
-        triggerButtonContainer.appendChild(triggerButton);
-        triggerShownAt = performance.now();
-
-        triggerButton.addEventListener("click", () => {
-          setTimeout(() => {
-            const clickedAt = performance.now();
-            const diff = clickedAt - triggerShownAt;
-
-            if (diff <= 350) {
-              timeButtons.style.display = "block";
-              triggerButtonContainer.innerHTML = "";
-            } else {
-              message.textContent = "실패! 너무 늦었습니다.";
-              retryButton.style.display = "inline-block";
-              triggerButtonContainer.innerHTML = "";
-            }
-          }, 150); // 150ms delay
-        });
-      }, 5000);
+      showCountdown(5);
     });
 
     retryButton.addEventListener("click", () => {

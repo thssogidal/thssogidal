@@ -1,72 +1,109 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>손내향미 예약 연습 시뮬레이터</title>
+  <meta charset="UTF-8" />
+  <title>손내향미 예약 시뮬레이터</title>
   <style>
     body {
-      font-family: sans-serif;
-      text-align: center;
-      margin-top: 50px;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
     }
-    #status, #countdown {
-      font-size: 1.5em;
-      margin-top: 20px;
+    h1 {
       color: #333;
     }
-    button {
-      font-size: 1.2em;
+    #status {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
+    #reserveButton, #retryButton, .time-button {
       padding: 10px 20px;
       margin: 5px;
+      font-size: 1em;
+      cursor: pointer;
     }
-    #timeButtons {
-      margin-top: 20px;
+    #retryButton {
+      display: none;
+    }
+    .time-button {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <h1>손내향미 예약 연습 시뮬레이터</h1>
-  <div id="countdown">5초 후 예약 시작</div>
-  <button onclick="tryReserve()">예약하기</button>
+  <h1>손내향미 예약 시뮬레이터</h1>
   <div id="status">예약 오픈 대기 중...</div>
-  <div id="timeButtons" style="display:none;">
-    <button>12:00</button>
-    <button>12:30</button>
-    <button>1:30</button>
-    <button>2:00</button>
+  <button id="reserveButton">예약하기</button>
+  <div id="times">
+    <button class="time-button">12:00</button>
+    <button class="time-button">12:30</button>
+    <button class="time-button">1:30</button>
+    <button class="time-button">2:00</button>
   </div>
+  <button id="retryButton">재도전하시겠습니까?</button>
 
   <script>
-    // 예약 오픈 시간: 현재 시간 + 5초
-    let openTime = new Date().getTime() + 5000;
-    let countdownEl = document.getElementById("countdown");
-    let statusEl = document.getElementById("status");
-    let timeButtonsEl = document.getElementById("timeButtons");
+    const statusText = document.getElementById("status");
+    const reserveButton = document.getElementById("reserveButton");
+    const retryButton = document.getElementById("retryButton");
+    const timeButtons = document.querySelectorAll(".time-button");
 
-    function updateCountdown() {
-      let now = new Date().getTime();
-      let remaining = Math.max(0, Math.ceil((openTime - now) / 1000));
-      countdownEl.innerText = remaining > 0
-        ? remaining + "초 후 예약 시작"
-        : "예약 가능!";
-      if (remaining <= 0) clearInterval(timer);
+    let reserveWindowOpen = false;
+    let reserveOpenedAt = null;
+    let reserveClicked = false;
+
+    function startCountdown() {
+      let count = 5;
+      statusText.textContent = `예약 시작까지 ${count}초`;
+      const countdown = setInterval(() => {
+        count--;
+        if (count > 0) {
+          statusText.textContent = `예약 시작까지 ${count}초`;
+        } else {
+          clearInterval(countdown);
+          reserveWindowOpen = true;
+          reserveOpenedAt = performance.now();
+          statusText.textContent = "예약 가능!";
+        }
+      }, 1000);
     }
 
-    let timer = setInterval(updateCountdown, 100);
+    function reset() {
+      reserveWindowOpen = false;
+      reserveClicked = false;
+      reserveOpenedAt = null;
+      statusText.textContent = "예약 오픈 대기 중...";
+      retryButton.style.display = "none";
+      reserveButton.disabled = false;
+      timeButtons.forEach(btn => btn.style.display = "none");
+    }
 
-    function tryReserve() {
-      let now = new Date().getTime();
-      let diff = now - openTime;
+    reserveButton.addEventListener("click", () => {
+      if (!reserveWindowOpen) {
+        reserveButton.disabled = true;
+        startCountdown();
+      } else if (!reserveClicked) {
+        reserveClicked = true;
+        const now = performance.now();
+        const elapsed = now - reserveOpenedAt;
 
-      if (diff >= 0 && diff <= 5100) {
-        statusEl.innerText = "🎉 예약 가능 시간!";
-        timeButtonsEl.style.display = "block";
-      } else if (diff < 0) {
-        statusEl.innerText = "❌ 아직 오픈 전입니다.";
-      } else {
-        statusEl.innerText = "😭 이미 늦었습니다.";
+        if (elapsed <= 100) {
+          statusText.textContent = "예약 성공! 원하는 시간을 선택하세요.";
+          timeButtons.forEach(btn => btn.style.display = "inline-block");
+        } else {
+          statusText.textContent = "실패! 0.1초를 넘겼습니다.";
+          retryButton.style.display = "inline-block";
+        }
       }
-    }
+    });
+
+    retryButton.addEventListener("click", () => {
+      reset();
+    });
   </script>
 </body>
 </html>

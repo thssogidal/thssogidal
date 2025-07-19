@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>손내향미 예약 연습 시뮬레이터</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    #status {
+      font-size: 1.5em;
+      margin-top: 20px;
+      color: #333;
+    }
+    button {
+      font-size: 1.2em;
+      padding: 10px 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>손내향미 예약 연습 시뮬레이터</h1>
+  <button onclick="tryReserve()">예약하기</button>
+  <div id="status">예약 오픈 대기 중...</div>
+
+  <script>
+    const openTime = new Date().getTime() + 10000; // 현재 시간 기준 10초 뒤
+
+    function tryReserve() {
+      const now = new Date().getTime();
+      const diff = now - openTime;
+
+      if (diff >= 0 && diff <= 1000) {
+        document.getElementById("status").innerText = "🎉 예약 성공!";
+      } else if (diff < 0) {
+        document.getElementById("status").innerText = "❌ 아직 오픈 전입니다.";
+      } else {
+        document.getElementById("status").innerText = "😭 이미 늦었습니다.";
+      }
+    }
+  </script>
+</body>
+</html>

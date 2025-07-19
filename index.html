@@ -20,6 +20,11 @@
       color: white;
       border: none;
     }
+    #timeButtons button {
+      background-color: #FF6600;
+      color: white;
+      border: none;
+    }
   </style>
 </head>
 <body>
@@ -44,6 +49,8 @@
     const retryButton = document.getElementById("retryButton");
 
     let triggerShownAt = 0;
+    let autoFailTimeout = null;
+    let clicked = false;
 
     function showCountdown(seconds) {
       if (seconds === 0) {
@@ -62,22 +69,31 @@
       triggerButtonContainer.innerHTML = "";
       triggerButtonContainer.appendChild(triggerButton);
       triggerShownAt = performance.now();
+      clicked = false;
 
+      // 클릭 이벤트
       triggerButton.addEventListener("click", () => {
         setTimeout(() => {
           const clickedAt = performance.now();
           const diff = clickedAt - triggerShownAt;
 
           if (diff <= 350) {
+            clicked = true;
+            clearTimeout(autoFailTimeout);
             timeButtons.style.display = "block";
-            triggerButtonContainer.innerHTML = "";
-          } else {
-            message.textContent = "실패! 너무 늦었습니다.";
-            retryButton.style.display = "inline-block";
             triggerButtonContainer.innerHTML = "";
           }
         }, 100); // 100ms 반응 딜레이
       });
+
+      // 자동 실패 처리
+      autoFailTimeout = setTimeout(() => {
+        if (!clicked) {
+          message.textContent = "실패! 너무 늦었습니다.";
+          triggerButtonContainer.innerHTML = "";
+          retryButton.style.display = "inline-block";
+        }
+      }, 350);
     }
 
     startButton.addEventListener("click", () => {

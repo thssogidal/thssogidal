@@ -12,13 +12,23 @@
       overflow: hidden;
     }
 
+    /* 메인 타이틀 */
+    #mainTitle {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
     /* 중앙 메시지 */
     #message {
       position: absolute;
-      top: 40%;
+      top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 24px;
+      font-size: 20px;
       font-weight: bold;
       text-align: center;
     }
@@ -68,6 +78,9 @@
   </style>
 </head>
 <body>
+
+  <!-- 메인 타이틀 -->
+  <div id="mainTitle">손내향미 예약 연습</div>
 
   <!-- 중앙 메시지 -->
   <div id="message">예약 오픈 대기 중...</div>

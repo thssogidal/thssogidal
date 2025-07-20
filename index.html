@@ -248,17 +248,21 @@
       triggerShownAt = performance.now();
       clicked = false;
 
-      triggerButton.addEventListener("click", () => {
-        // 반응속도 지연 없음 (즉시 실행)
-        const clickedAt = performance.now();
-        const diff = clickedAt - triggerShownAt;
-        if (diff <= 350) {
-          clicked = true;
-          clearTimeout(autoFailTimeout);
-          timeButtons.style.display = "block";
-          triggerButtonContainer.innerHTML = "";
-        }
-      });
+      const handleClick = () => {
+        setTimeout(() => {
+          const clickedAt = performance.now();
+          const diff = clickedAt - triggerShownAt;
+          if (diff <= 350) {
+            clicked = true;
+            clearTimeout(autoFailTimeout);
+            timeButtons.style.display = "block";
+            triggerButtonContainer.innerHTML = "";
+          }
+        }, 100);
+      };
+
+      triggerButton.addEventListener("click", handleClick);
+      triggerButton.addEventListener("touchstart", handleClick);
 
       autoFailTimeout = setTimeout(() => {
         if (!clicked) {
@@ -269,7 +273,15 @@
       }, 350);
     }
 
-    startButton.addEventListener("click", () => {
+    const handleButton = (btn, handler) => {
+      btn.addEventListener("click", e => setTimeout(() => handler(e), 100));
+      btn.addEventListener("touchstart", e => {
+        e.preventDefault();
+        setTimeout(() => handler(e), 100);
+      });
+    };
+
+    handleButton(startButton, () => {
       message.textContent = "예약 오픈 대기 중...";
       startButton.style.display = "none";
       timeButtons.style.display = "none";
@@ -278,7 +290,7 @@
       showCountdown(5);
     });
 
-    retryButton.addEventListener("click", () => {
+    handleButton(retryButton, () => {
       startButton.style.display = "inline-block";
       message.textContent = "예약 오픈 대기 중...";
       retryButton.style.display = "none";
@@ -287,7 +299,7 @@
     });
 
     document.querySelectorAll('#timeButtons button').forEach(btn => {
-      btn.addEventListener('click', () => {
+      handleButton(btn, () => {
         const timeText = btn.textContent;
         selectedTimeText.textContent = `예약 시간: ${timeText}`;
         message.textContent = "예약에 성공하셨습니다!";
@@ -296,7 +308,7 @@
     });
 
     document.querySelectorAll(".plus").forEach(btn => {
-      btn.addEventListener("click", () => {
+      handleButton(btn, () => {
         const type = btn.dataset.type;
         const target = type === "adult" ? adultCount : teenCount;
         target.textContent = parseInt(target.textContent) + 1;
@@ -304,7 +316,7 @@
     });
 
     document.querySelectorAll(".minus").forEach(btn => {
-      btn.addEventListener("click", () => {
+      handleButton(btn, () => {
         const type = btn.dataset.type;
         const target = type === "adult" ? adultCount : teenCount;
         const current = parseInt(target.textContent);
@@ -312,7 +324,7 @@
       });
     });
 
-    closePopup.addEventListener("click", () => {
+    handleButton(closePopup, () => {
       popupOverlay.style.display = "none";
     });
   </script>

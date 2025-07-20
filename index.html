@@ -3,100 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>손내향미 예약 연습</title>
+  <title>손내향미</title>
   <style>
     body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background-color: #f5f5f5;
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
     }
-
-    #mainTitle {
-      position: absolute;
-      top: 30%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 28px;
-      font-weight: bold;
-      padding: 10px 30px;
-      color: #333;
-      font-family: 'Apple SD Gothic Neo', sans-serif;
-      text-shadow: 1px 1px 2px #ddd;
-      white-space: nowrap;
-      background: #ffffffcc;
-      border-radius: 10px;
-      display: inline-block;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-
-    #message {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 20px;
-      font-weight: bold;
-      text-align: center;
-      white-space: nowrap;
-      color: #333;
-      background: #fff4e1;
-      padding: 15px 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    #bottomArea {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background-color: white;
-      padding: 10px 0;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    h1 {
       text-align: center;
     }
-
-    #startButton, #retryButton {
-      font-size: 18px;
-      padding: 12px 24px;
-      margin: 5px;
-    }
-
-    #triggerButton {
-      background-color: orange;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 18px;
-    }
-
     #timeButtons {
-      display: none;
-      white-space: nowrap;
-      overflow-x: auto;
-      padding: 10px 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 20px 0;
     }
-
     #timeButtons button {
-      background-color: #FF6600;
+      margin: 10px;
+      padding: 15px 25px;
+      font-size: 16px;
+      background-color: #4CAF50;
       color: white;
       border: none;
-      width: 80px;
-      height: 40px;
-      margin: 0 5px;
-      flex-shrink: 0;
-      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #timeButtons button:hover {
+      background-color: #45a049;
+    }
+    #message {
+      margin: 20px 0;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
     }
 
-    /* 인원 선택 팝업 모달 */
+    /* ★ 흐린 배경 오버레이 */
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 998;
+    }
+
+    /* ★ 팝업형 인원 선택 */
     #personSelector {
       display: none;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #fff;
+      background: white;
       padding: 30px 40px;
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -104,172 +66,95 @@
       text-align: center;
     }
 
-    .countGroup {
-      margin: 10px 0;
-    }
-
-    .countGroup span {
-      display: inline-block;
-      width: 80px;
-      text-align: right;
-      margin-right: 10px;
-      font-weight: bold;
-    }
-
-    .counter {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .counter button {
-      width: 30px;
-      height: 30px;
+    #personSelector p {
       font-size: 18px;
-      background-color: #ddd;
+      margin-bottom: 10px;
+    }
+
+    #personSelector button {
+      margin: 0 10px;
+      padding: 10px 15px;
+      font-size: 16px;
       border: none;
       border-radius: 5px;
+      background-color: #2196F3;
+      color: white;
       cursor: pointer;
     }
 
-    .counter .number {
-      min-width: 20px;
-      text-align: center;
-      font-size: 16px;
+    #personSelector button:hover {
+      background-color: #0b7dda;
     }
 
-    /* 흐린 배경 */
-    #overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.3);
-      z-index: 998;
+    #personSelector span {
+      font-size: 20px;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+
+    #actionButtons {
+      margin-top: 20px;
+    }
+
+    #actionButtons button {
+      margin: 10px;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #ff9800;
+      color: white;
+      cursor: pointer;
+    }
+
+    #actionButtons button:hover {
+      background-color: #e68900;
     }
   </style>
 </head>
 <body>
 
-  <div id="mainTitle">손내향미 예약 연습</div>
-  <div id="message">예약 오픈 대기 중...</div>
+  <h1>손내향미 예약 연습</h1>
 
-  <!-- 흐린 배경 -->
+  <div id="timeButtons">
+    <button>1:00</button>
+    <button>2:00</button>
+    <button>3:00</button>
+    <button>4:00</button>
+    <button>5:00</button>
+  </div>
+
+  <div id="message">예약할 시간을 선택하세요</div>
+
+  <!-- ★ 흐린 배경 오버레이 -->
   <div id="overlay"></div>
 
-  <div id="bottomArea">
-    <button id="startButton">시작하기</button>
-    <div id="triggerButtonContainer"></div>
+  <!-- ★ 팝업 인원 수 선택 -->
+  <div id="personSelector">
+    <p>몇 명이신가요?</p>
+    <button id="decrease">-</button>
+    <span id="count">1</span>
+    <button id="increase">+</button>
 
-    <div id="timeButtons">
-      <button>12:00</button>
-      <button>12:30</button>
-      <button>1:00</button>
-      <button>2:00</button>
-      <button>3:00</button>
-      <button>4:00</button>
-      <button>5:00</button>
-      <button>6:00</button>
+    <div id="actionButtons">
+      <button id="start">예약 확정</button>
+      <button id="retry">다시 선택</button>
     </div>
-
-    <!-- 팝업 인원 선택 -->
-    <div id="personSelector">
-      <div id="successMessage">예약에 성공하셨습니다! 인원 수를 선택하세요.</div>
-
-      <div class="countGroup">
-        <span>성인</span>
-        <div class="counter">
-          <button class="minus" data-type="adult">−</button>
-          <div class="number" id="adultCount">0</div>
-          <button class="plus" data-type="adult">＋</button>
-        </div>
-      </div>
-
-      <div class="countGroup">
-        <span>청소년</span>
-        <div class="counter">
-          <button class="minus" data-type="teen">−</button>
-          <div class="number" id="teenCount">0</div>
-          <button class="plus" data-type="teen">＋</button>
-        </div>
-      </div>
-    </div>
-
-    <button id="retryButton" style="display: none;">재도전하시겠습니까?</button>
   </div>
 
   <script>
-    const startButton = document.getElementById("startButton");
     const message = document.getElementById("message");
-    const triggerButtonContainer = document.getElementById("triggerButtonContainer");
-    const timeButtons = document.getElementById("timeButtons");
-    const retryButton = document.getElementById("retryButton");
     const personSelector = document.getElementById("personSelector");
     const overlay = document.getElementById("overlay");
 
-    let triggerShownAt = 0;
-    let autoFailTimeout = null;
-    let clicked = false;
+    const countDisplay = document.getElementById("count");
+    const decreaseBtn = document.getElementById("decrease");
+    const increaseBtn = document.getElementById("increase");
+    const startButton = document.getElementById("start");
+    const retryButton = document.getElementById("retry");
 
-    function showCountdown(seconds) {
-      if (seconds === 0) {
-        message.textContent = "예약 가능!";
-        showTriggerButton();
-        return;
-      }
-      message.textContent = `${seconds}초 후 예약 가능!`;
-      setTimeout(() => showCountdown(seconds - 1), 1000);
-    }
+    let count = 1;
 
-    function showTriggerButton() {
-      const triggerButton = document.createElement("button");
-      triggerButton.id = "triggerButton";
-      triggerButton.textContent = "예약하기!";
-      triggerButtonContainer.innerHTML = "";
-      triggerButtonContainer.appendChild(triggerButton);
-      triggerShownAt = performance.now();
-      clicked = false;
-
-      triggerButton.addEventListener("click", () => {
-        setTimeout(() => {
-          const clickedAt = performance.now();
-          const diff = clickedAt - triggerShownAt;
-          if (diff <= 350) {
-            clicked = true;
-            clearTimeout(autoFailTimeout);
-            timeButtons.style.display = "block";
-            triggerButtonContainer.innerHTML = "";
-          }
-        }, 100);
-      });
-
-      autoFailTimeout = setTimeout(() => {
-        if (!clicked) {
-          message.textContent = "실패! 너무 늦었습니다.";
-          triggerButtonContainer.innerHTML = "";
-          retryButton.style.display = "inline-block";
-        }
-      }, 350);
-    }
-
-    startButton.addEventListener("click", () => {
-      message.textContent = "예약 오픈 대기 중...";
-      startButton.style.display = "none";
-      timeButtons.style.display = "none";
-      retryButton.style.display = "none";
-      overlay.style.display = "none";
-      personSelector.style.display = "none";
-    });
-
-    retryButton.addEventListener("click", () => {
-      startButton.style.display = "inline-block";
-      message.textContent = "예약 오픈 대기 중...";
-      retryButton.style.display = "none";
-      timeButtons.style.display = "none";
-      overlay.style.display = "none";
-      personSelector.style.display = "none";
-    });
-
-    // ✅ 시간 버튼 클릭 시 모달 팝업 + 메시지 업데이트
     document.querySelectorAll('#timeButtons button').forEach(btn => {
       btn.addEventListener('click', () => {
         const selectedTime = btn.textContent;
@@ -279,25 +164,26 @@
       });
     });
 
-    // ✅ 인원 수 조절 기능
-    const adultCount = document.getElementById("adultCount");
-    const teenCount = document.getElementById("teenCount");
-
-    document.querySelectorAll(".plus").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const type = btn.dataset.type;
-        const target = type === "adult" ? adultCount : teenCount;
-        target.textContent = parseInt(target.textContent) + 1;
-      });
+    decreaseBtn.addEventListener("click", () => {
+      if (count > 1) {
+        count--;
+        countDisplay.textContent = count;
+      }
     });
 
-    document.querySelectorAll(".minus").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const type = btn.dataset.type;
-        const target = type === "adult" ? adultCount : teenCount;
-        const current = parseInt(target.textContent);
-        if (current > 0) target.textContent = current - 1;
-      });
+    increaseBtn.addEventListener("click", () => {
+      count++;
+      countDisplay.textContent = count;
+    });
+
+    startButton.addEventListener("click", () => {
+      personSelector.style.display = "none";
+      overlay.style.display = "none";
+    });
+
+    retryButton.addEventListener("click", () => {
+      personSelector.style.display = "none";
+      overlay.style.display = "none";
     });
   </script>
 </body>

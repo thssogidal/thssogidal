@@ -89,15 +89,23 @@
       font-size: 16px;
     }
 
-    /* 인원 선택 영역 스타일 */
+    /* 인원 선택 팝업 모달 */
     #personSelector {
       display: none;
-      margin-top: 20px;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      z-index: 999;
       text-align: center;
     }
 
     .countGroup {
-      margin: 10px;
+      margin: 10px 0;
     }
 
     .countGroup span {
@@ -129,12 +137,24 @@
       text-align: center;
       font-size: 16px;
     }
+
+    /* 흐린 배경 */
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 998;
+    }
   </style>
 </head>
 <body>
 
   <div id="mainTitle">손내향미 예약 연습</div>
   <div id="message">예약 오픈 대기 중...</div>
+
+  <!-- 흐린 배경 -->
+  <div id="overlay"></div>
 
   <div id="bottomArea">
     <button id="startButton">시작하기</button>
@@ -151,6 +171,7 @@
       <button>6:00</button>
     </div>
 
+    <!-- 팝업 인원 선택 -->
     <div id="personSelector">
       <div id="successMessage">예약에 성공하셨습니다! 인원 수를 선택하세요.</div>
 
@@ -183,6 +204,7 @@
     const timeButtons = document.getElementById("timeButtons");
     const retryButton = document.getElementById("retryButton");
     const personSelector = document.getElementById("personSelector");
+    const overlay = document.getElementById("overlay");
 
     let triggerShownAt = 0;
     let autoFailTimeout = null;
@@ -234,8 +256,8 @@
       startButton.style.display = "none";
       timeButtons.style.display = "none";
       retryButton.style.display = "none";
+      overlay.style.display = "none";
       personSelector.style.display = "none";
-      showCountdown(5);
     });
 
     retryButton.addEventListener("click", () => {
@@ -243,18 +265,21 @@
       message.textContent = "예약 오픈 대기 중...";
       retryButton.style.display = "none";
       timeButtons.style.display = "none";
+      overlay.style.display = "none";
       personSelector.style.display = "none";
     });
 
-    // ✅ 시간 버튼 클릭 시 인원 선택 UI 등장
+    // ✅ 시간 버튼 클릭 시 모달 팝업 + 메시지 업데이트
     document.querySelectorAll('#timeButtons button').forEach(btn => {
       btn.addEventListener('click', () => {
-        message.textContent = "예약에 성공하셨습니다! 인원 수를 선택하세요.";
+        const selectedTime = btn.textContent;
+        message.textContent = `예약에 성공하셨습니다! (${selectedTime} 예약됨)`;
         personSelector.style.display = "block";
+        overlay.style.display = "block";
       });
     });
 
-    // ✅ 인원 수 증감 이벤트
+    // ✅ 인원 수 조절 기능
     const adultCount = document.getElementById("adultCount");
     const teenCount = document.getElementById("teenCount");
 

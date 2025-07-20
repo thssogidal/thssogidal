@@ -10,13 +10,12 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
-      background-color: #f5f5f5; /* 밝은 회색 배경 */
+      background-color: #f5f5f5;
     }
 
-    /* 메인 타이틀 */
     #mainTitle {
       position: absolute;
-      top: 30%; /* 중앙에서 조금 위쪽으로 조정 */
+      top: 30%;
       left: 50%;
       transform: translate(-50%, -50%);
       font-size: 28px;
@@ -26,13 +25,12 @@
       font-family: 'Apple SD Gothic Neo', sans-serif;
       text-shadow: 1px 1px 2px #ddd;
       white-space: nowrap;
-      background: #ffffffcc; /* 반투명 흰색 배경 박스 */
+      background: #ffffffcc;
       border-radius: 10px;
       display: inline-block;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
-    /* 중앙 메시지 */
     #message {
       position: absolute;
       top: 50%;
@@ -49,7 +47,6 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
-    /* 하단 버튼 영역 */
     #bottomArea {
       position: fixed;
       bottom: 0;
@@ -91,20 +88,58 @@
       flex-shrink: 0;
       font-size: 16px;
     }
+
+    /* 인원 선택 영역 스타일 */
+    #personSelector {
+      display: none;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .countGroup {
+      margin: 10px;
+    }
+
+    .countGroup span {
+      display: inline-block;
+      width: 80px;
+      text-align: right;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+
+    .counter {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .counter button {
+      width: 30px;
+      height: 30px;
+      font-size: 18px;
+      background-color: #ddd;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .counter .number {
+      min-width: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
 
-  <!-- 메인 타이틀 -->
   <div id="mainTitle">손내향미 예약 연습</div>
-
-  <!-- 중앙 메시지 -->
   <div id="message">예약 오픈 대기 중...</div>
 
-  <!-- 하단 영역 -->
   <div id="bottomArea">
     <button id="startButton">시작하기</button>
     <div id="triggerButtonContainer"></div>
+
     <div id="timeButtons">
       <button>12:00</button>
       <button>12:30</button>
@@ -115,6 +150,29 @@
       <button>5:00</button>
       <button>6:00</button>
     </div>
+
+    <div id="personSelector">
+      <div id="successMessage">예약에 성공하셨습니다! 인원 수를 선택하세요.</div>
+
+      <div class="countGroup">
+        <span>성인</span>
+        <div class="counter">
+          <button class="minus" data-type="adult">−</button>
+          <div class="number" id="adultCount">0</div>
+          <button class="plus" data-type="adult">＋</button>
+        </div>
+      </div>
+
+      <div class="countGroup">
+        <span>청소년</span>
+        <div class="counter">
+          <button class="minus" data-type="teen">−</button>
+          <div class="number" id="teenCount">0</div>
+          <button class="plus" data-type="teen">＋</button>
+        </div>
+      </div>
+    </div>
+
     <button id="retryButton" style="display: none;">재도전하시겠습니까?</button>
   </div>
 
@@ -124,6 +182,7 @@
     const triggerButtonContainer = document.getElementById("triggerButtonContainer");
     const timeButtons = document.getElementById("timeButtons");
     const retryButton = document.getElementById("retryButton");
+    const personSelector = document.getElementById("personSelector");
 
     let triggerShownAt = 0;
     let autoFailTimeout = null;
@@ -175,6 +234,7 @@
       startButton.style.display = "none";
       timeButtons.style.display = "none";
       retryButton.style.display = "none";
+      personSelector.style.display = "none";
       showCountdown(5);
     });
 
@@ -183,6 +243,36 @@
       message.textContent = "예약 오픈 대기 중...";
       retryButton.style.display = "none";
       timeButtons.style.display = "none";
+      personSelector.style.display = "none";
+    });
+
+    // ✅ 시간 버튼 클릭 시 인원 선택 UI 등장
+    document.querySelectorAll('#timeButtons button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        message.textContent = "예약에 성공하셨습니다! 인원 수를 선택하세요.";
+        personSelector.style.display = "block";
+      });
+    });
+
+    // ✅ 인원 수 증감 이벤트
+    const adultCount = document.getElementById("adultCount");
+    const teenCount = document.getElementById("teenCount");
+
+    document.querySelectorAll(".plus").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const type = btn.dataset.type;
+        const target = type === "adult" ? adultCount : teenCount;
+        target.textContent = parseInt(target.textContent) + 1;
+      });
+    });
+
+    document.querySelectorAll(".minus").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const type = btn.dataset.type;
+        const target = type === "adult" ? adultCount : teenCount;
+        const current = parseInt(target.textContent);
+        if (current > 0) target.textContent = current - 1;
+      });
     });
   </script>
 </body>

@@ -89,15 +89,30 @@
       font-size: 16px;
     }
 
-    /* 인원 선택 영역 스타일 */
-    #personSelector {
+    /* ✅ 팝업 인원 선택창 */
+    #popupOverlay {
       display: none;
-      margin-top: 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0,0,0,0.4);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #popupContent {
+      background-color: #fff;
+      padding: 30px 40px;
+      border-radius: 12px;
       text-align: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
 
     .countGroup {
-      margin: 10px;
+      margin: 15px 0;
     }
 
     .countGroup span {
@@ -129,6 +144,23 @@
       text-align: center;
       font-size: 16px;
     }
+
+    #selectedTime {
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #444;
+    }
+
+    #closePopup {
+      margin-top: 20px;
+      padding: 8px 20px;
+      background-color: orange;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -151,8 +183,13 @@
       <button>6:00</button>
     </div>
 
-    <div id="personSelector">
-      <div id="successMessage">예약에 성공하셨습니다! 인원 수를 선택하세요.</div>
+    <button id="retryButton" style="display: none;">재도전하시겠습니까?</button>
+  </div>
+
+  <!-- ✅ 팝업 영역 -->
+  <div id="popupOverlay">
+    <div id="popupContent">
+      <div id="selectedTime">예약 시간: -</div>
 
       <div class="countGroup">
         <span>성인</span>
@@ -171,9 +208,9 @@
           <button class="plus" data-type="teen">＋</button>
         </div>
       </div>
-    </div>
 
-    <button id="retryButton" style="display: none;">재도전하시겠습니까?</button>
+      <button id="closePopup">확인</button>
+    </div>
   </div>
 
   <script>
@@ -182,7 +219,13 @@
     const triggerButtonContainer = document.getElementById("triggerButtonContainer");
     const timeButtons = document.getElementById("timeButtons");
     const retryButton = document.getElementById("retryButton");
-    const personSelector = document.getElementById("personSelector");
+
+    const popupOverlay = document.getElementById("popupOverlay");
+    const selectedTimeText = document.getElementById("selectedTime");
+    const closePopup = document.getElementById("closePopup");
+
+    const adultCount = document.getElementById("adultCount");
+    const teenCount = document.getElementById("teenCount");
 
     let triggerShownAt = 0;
     let autoFailTimeout = null;
@@ -234,7 +277,7 @@
       startButton.style.display = "none";
       timeButtons.style.display = "none";
       retryButton.style.display = "none";
-      personSelector.style.display = "none";
+      popupOverlay.style.display = "none";
       showCountdown(5);
     });
 
@@ -243,21 +286,19 @@
       message.textContent = "예약 오픈 대기 중...";
       retryButton.style.display = "none";
       timeButtons.style.display = "none";
-      personSelector.style.display = "none";
+      popupOverlay.style.display = "none";
     });
 
-    // ✅ 시간 버튼 클릭 시 인원 선택 UI 등장
     document.querySelectorAll('#timeButtons button').forEach(btn => {
       btn.addEventListener('click', () => {
-        message.textContent = "예약에 성공하셨습니다! 인원 수를 선택하세요.";
-        personSelector.style.display = "block";
+        const timeText = btn.textContent;
+        selectedTimeText.textContent = `예약 시간: ${timeText}`;
+        message.textContent = "예약에 성공하셨습니다!";
+        popupOverlay.style.display = "flex";
       });
     });
 
-    // ✅ 인원 수 증감 이벤트
-    const adultCount = document.getElementById("adultCount");
-    const teenCount = document.getElementById("teenCount");
-
+    // 인원 수 증감 이벤트
     document.querySelectorAll(".plus").forEach(btn => {
       btn.addEventListener("click", () => {
         const type = btn.dataset.type;
@@ -273,6 +314,10 @@
         const current = parseInt(target.textContent);
         if (current > 0) target.textContent = current - 1;
       });
+    });
+
+    closePopup.addEventListener("click", () => {
+      popupOverlay.style.display = "none";
     });
   </script>
 </body>

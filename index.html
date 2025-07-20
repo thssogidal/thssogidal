@@ -89,7 +89,6 @@
       font-size: 16px;
     }
 
-    /* ✅ 팝업 인원 선택창 */
     #popupOverlay {
       display: none;
       position: fixed;
@@ -186,7 +185,6 @@
     <button id="retryButton" style="display: none;">재도전하시겠습니까?</button>
   </div>
 
-  <!-- ✅ 팝업 영역 -->
   <div id="popupOverlay">
     <div id="popupContent">
       <div id="selectedTime">예약 시간: -</div>
@@ -251,16 +249,15 @@
       clicked = false;
 
       triggerButton.addEventListener("click", () => {
-        setTimeout(() => {
-          const clickedAt = performance.now();
-          const diff = clickedAt - triggerShownAt;
-          if (diff <= 350) {
-            clicked = true;
-            clearTimeout(autoFailTimeout);
-            timeButtons.style.display = "block";
-            triggerButtonContainer.innerHTML = "";
-          }
-        }, 100);
+        // 반응속도 지연 없음 (즉시 실행)
+        const clickedAt = performance.now();
+        const diff = clickedAt - triggerShownAt;
+        if (diff <= 350) {
+          clicked = true;
+          clearTimeout(autoFailTimeout);
+          timeButtons.style.display = "block";
+          triggerButtonContainer.innerHTML = "";
+        }
       });
 
       autoFailTimeout = setTimeout(() => {
@@ -298,7 +295,6 @@
       });
     });
 
-    // 인원 수 증감 이벤트
     document.querySelectorAll(".plus").forEach(btn => {
       btn.addEventListener("click", () => {
         const type = btn.dataset.type;

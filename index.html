@@ -298,14 +298,46 @@
       popupOverlay.style.display = "none";
     });
 
+    // === 여기부터 터치 스크롤 오작동 방지 로직 추가 ===
     document.querySelectorAll('#timeButtons button').forEach(btn => {
-      handleButton(btn, () => {
-        const timeText = btn.textContent;
-        selectedTimeText.textContent = `예약 시간: ${timeText}`;
-        message.textContent = "예약에 성공하셨습니다!";
-        popupOverlay.style.display = "flex";
+      let touchStartY = 0;
+      let touchMoved = false;
+
+      btn.addEventListener('touchstart', e => {
+        touchStartY = e.touches[0].clientY;
+        touchMoved = false;
+      });
+
+      btn.addEventListener('touchmove', e => {
+        const currentY = e.touches[0].clientY;
+        if (Math.abs(currentY - touchStartY) > 10) {
+          touchMoved = true;
+        }
+      });
+
+      btn.addEventListener('touchend', e => {
+        if (!touchMoved) {
+          e.preventDefault();
+          setTimeout(() => {
+            const timeText = btn.textContent;
+            selectedTimeText.textContent = `예약 시간: ${timeText}`;
+            message.textContent = "예약에 성공하셨습니다!";
+            popupOverlay.style.display = "flex";
+          }, 100);
+        }
+      });
+
+      // PC 클릭 이벤트도 기존 handleButton 유지
+      btn.addEventListener('click', e => {
+        setTimeout(() => {
+          const timeText = btn.textContent;
+          selectedTimeText.textContent = `예약 시간: ${timeText}`;
+          message.textContent = "예약에 성공하셨습니다!";
+          popupOverlay.style.display = "flex";
+        }, 100);
       });
     });
+    // === 여기까지 터치 스크롤 오작동 방지 로직 추가 ===
 
     document.querySelectorAll(".plus").forEach(btn => {
       handleButton(btn, () => {
